@@ -19,7 +19,7 @@ from django.conf.urls import include
 import coreapp.views
 
 urlpatterns = [
-    path('admin/login/', coreapp.views.not_found, name='not_found'),
+    # path('admin/login/', coreapp.views.not_found, name='not_found'),
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('mypage', coreapp.views.mypage, name='mypage'),

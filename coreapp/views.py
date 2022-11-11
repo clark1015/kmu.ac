@@ -3,8 +3,10 @@ import re
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, FileResponse
 from .models import shortURL
+from django.http import JsonResponse
+from django.core.cache import cache
 
-
+import time
 import qrcode
 import re
 import io
@@ -53,6 +55,7 @@ def create(request):
             print(result)
             return JsonResponse(result)
         except:
+            cache.set(path, url)
             shortURL(path_word=path, url=url, creater=request.user).save()
             result = { 'result': 'success',
                         'data': req_data['path_word'].replace(' ', '_')}
@@ -193,7 +196,21 @@ def not_found(request):
 
 
 def mapping(request, path_word):
+    start = time.time()
     try:
-        return redirect(shortURL.objects.get(path_word=str2urlpath(path_word)).url)
+        path_word=str2urlpath(path_word)
+        if not cache.get(path_word):
+            urlResult = (shortURL.objects.get(path_word=str2urlpath(path_word))).url
+            cache.set(path_word, urlResult)
+            return redirect(urlResult)
+        urlResult = (cache.get(path_word=str2urlpath(path_word))).url
+        end = time.time()
+        print(end-start)
+        return redirect(urlResult)
     except:
         return redirect('/not_found')
+    
+
+def my_view(request):
+    shortURLs = cache.get_or_set('shortURL', shortURL )
+    return JsonResponse(list(shortURLs), safe=False)

@@ -24,7 +24,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'm^m=98_q_zyzwyl9sf*cv&gqw=$e7%o8jkqs+s!mafw_5(o88&')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) ) 
+DEBUG = True
+#bool( os.environ.get('DJANGO_DEBUG', True) ) 
 
 ALLOWED_HOSTS = ['*']
 
@@ -34,7 +35,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.sites',
+    # 'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -154,10 +155,21 @@ AUTHENTICATION_BACKENDS = (
     
 )
 
-SITE_ID = 1
+SITE_ID = 2
 
 LOGIN_REDIRECT_URL = '/' ### 오류가 나면 홈으로 돌아와라
 
 
 db_from_env = dj_database_url.config(conn_max_age=500) # DB 설정부분 아래에 입력 
 DATABASES['default'].update(db_from_env) # DB 설정부분 아래에 입력
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1", # 1번 DB
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            'TIMEOUT': 5,
+        }
+    }
+}
